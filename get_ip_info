@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+import argparse
+from requests import get
+
+parser = argparse.ArgumentParser(description="Script para obeter el pais de una IP")
+parser.add_argument(dest="IP")
+parser.add_argument('-c', dest="code", required=False, action='store_true', help='Obtiene el codigo del país')
+parser.add_argument('-hn', dest="hostname", required=False, action='store_true', help='Obtiene el hostname')
+args = parser.parse_args()
+
+token = '741e2c7b8949ad'
+def validate_ip(ip):
+    # check number of periods
+    if ip.count('.') != 3:
+        return print('Invalid IP address')
+
+    ip_list = list(map(str, ip.split('.')))
+
+    # check range of each number between periods
+    for element in ip_list:
+        if int(element) < 0 or int(element) > 255 or (element[0] == '0' and len(element) != 1):
+            return print('Invalid IP address')
+
+    return argumentos(args.IP)
+
+def argumentos(ip):
+    if (args.code):
+        get_country_code(ip)
+
+    elif (args.hostname):
+        get_hostname(ip)
+
+    else:
+        get_country_name(ip)
+
+def get_country_name(ip):
+    r = get('http://ipinfo.io/'+ip+'/city/?token='+token)
+    return print(r.content.decode('utf-8'))
+
+def get_country_code(ip):
+    r = get('http://ipinfo.io/'+ip+'/country/?token='+token)
+    return print(r.content.decode('utf-8'))
+
+def get_hostname(ip):
+    r = get('http://ipinfo.io/'+ip+'/hostname/?token='+token)
+    return print(r.content.decode('utf-8'))
+
+def main():
+    print(args)
+    validate_ip(args.IP)
+
+if __name__ == '__main__':
+    main()
